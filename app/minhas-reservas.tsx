@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import { ReservaItem } from '../components/ReservaItem';
 import { globalStyles, colors } from '../constants/styles';
+import { useReservas } from '../context/ReservasContext';
 
 export default function MinhasReservasScreen() {
-  // Lista Mock. Membro 2 conectará isso ao state/context
-  const [reservas, setReservas] = useState([
-    { id: '1', labName: 'Lab Windows 1', data: '25/03/2026', horario: '14:00 - 16:00' },
-    { id: '2', labName: 'Maker Lab', data: '26/03/2026', horario: '08:00 - 12:00' },
-  ]);
+  const { reservas, cancelarReserva } = useReservas();
   const [cancelingId, setCancelingId] = useState<string | null>(null);
 
   const handleCancelar = (id: string) => {
@@ -17,62 +14,82 @@ export default function MinhasReservasScreen() {
       'Tem certeza que deseja cancelar esta reserva?',
       [
         { text: 'Não', style: 'cancel' },
-        { 
-          text: 'Sim', 
+        {
+          text: 'Sim, cancelar',
           style: 'destructive',
           onPress: () => {
             setCancelingId(id);
             setTimeout(() => {
-              setReservas(prev => prev.filter(r => r.id !== id));
+              cancelarReserva(id);
               setCancelingId(null);
-            }, 1000);
-          }
-        }
+            }, 800);
+          },
+        },
       ]
     );
   };
 
   return (
     <View style={globalStyles.container}>
-      <Text style={[globalStyles.title, styles.titleSpacing]}>Minhas Reservas</Text>
-
       {reservas.length === 0 ? (
         <View style={globalStyles.center}>
-          <Text style={styles.emptyText}>Você não possui reservas ativas.</Text>
+          <Text style={styles.emptyEmoji}>📋</Text>
+          <Text style={styles.emptyTitle}>Nenhuma reserva encontrada</Text>
+          <Text style={styles.emptyText}>
+            Suas reservas aparecerão aqui após você reservar um laboratório.
+          </Text>
         </View>
       ) : (
-        <FlatList
-          data={reservas}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <ReservaItem
-              labName={item.labName}
-              data={item.data}
-              horario={item.horario}
-              onCancel={() => handleCancelar(item.id)}
-              isCanceling={cancelingId === item.id}
-            />
-          )}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-        />
+        <>
+          <Text style={styles.countText}>
+            {reservas.length} {reservas.length === 1 ? 'reserva ativa' : 'reservas ativas'}
+          </Text>
+          <FlatList
+            data={reservas}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ReservaItem
+                labName={item.labName}
+                data={item.data}
+                horario={item.horario}
+                onCancel={() => handleCancelar(item.id)}
+                isCanceling={cancelingId === item.id}
+              />
+            )}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleSpacing: {
-    marginTop: 20,
-    marginBottom: 24,
-  },
   listContainer: {
     paddingBottom: 24,
   },
+  countText: {
+    fontSize: 14,
+    color: colors.textLight,
+    marginBottom: 16,
+    marginTop: 4,
+  },
+  emptyEmoji: {
+    fontSize: 56,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginBottom: 8,
+  },
   emptyText: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.textLight,
     textAlign: 'center',
     paddingHorizontal: 20,
-  }
+    lineHeight: 22,
+  },
 });

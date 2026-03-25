@@ -1,40 +1,94 @@
 # 🔬 FIAP Labs — Reserva de Laboratórios
 
-## 1. Visão Geral
-
-App desenvolvido para Checkpoint 1 da FIAP.
-Este repositório contém o código do aplicativo Mobile para reserva de Laboratórios.
+> Checkpoint 1 — Cross-Platform Application Development | FIAP · Ciência da Computação 2º Ano
 
 ---
 
 ## 👨‍💻 Membros
 
-- **Membro 1 (UI e Componentes):** [Nome do Membro 1] - RM [RM]
-- **Membro 2 (Lógica e Navegação):** [Nome do Membro 2] - RM [RM]
+| Membro | Papel | RM |
+|--------|-------|----|
+| [Nome do Membro 1] | UI & Componentes | RM[XXXXX] |
+| [Nome do Membro 2] | Navegação & Lógica | RM[XXXXX] |
 
 ---
 
 ## 🎥 Demonstração
 
-> [!NOTE]
 > Adicionar aqui o GIF/Vídeo de demonstração do aplicativo rodando.
 
 ---
 
-## 🚀 Como Executar o Projeto
+## 🚀 Como Executar
 
-1. Clone o repositório
-2. Instale as dependências com `npm install`
-3. Inicie o projeto com `npx expo start`
-4. Use o app Expo Go no seu celular ou um emulador/simulator local para testar.
+```bash
+# 1. Clone o repositório
+git clone <url-do-repositorio>
+
+# 2. Entre na pasta do projeto
+cd CP1-aplicativo
+
+# 3. Instale as dependências
+npm install
+
+# 4. Inicie o projeto
+npx expo start
+```
+
+Após iniciar, escaneie o QR Code com o app **Expo Go** (Android/iOS) ou pressione `a` para abrir no emulador Android.
+
+---
+
+## 📱 Telas
+
+| Tela | Rota | Descrição |
+|------|------|-----------|
+| Login | `/` | Entrada com RM do aluno |
+| Lista de Labs | `/labs` | Cards com status e horários |
+| Reservar | `/labs/reservar` | Formulário de reserva com validação |
+| Minhas Reservas | `/minhas-reservas` | Reservas ativas com cancelamento |
 
 ---
 
 ## 🧩 Hooks Utilizados
 
-- `useState`: Gerenciamento de estado (Mock e Formulários)
-- `useEffect`: Simulação de tempo de carregamento com ActivityIndicator
-- *(A ser preenchido pelo Membro 2 com router hooks e contexts)*
+| Hook | Onde | Para quê |
+|------|------|----------|
+| `useState` | Todas as telas | Controle de formulários, loading, cancelamento |
+| `useEffect` | `labs/index.tsx` | Simula carregamento de dados com `setTimeout` |
+| `useRouter` | `index.tsx`, `labs/index.tsx`, `labs/reservar.tsx` | Navegação programática entre telas |
+| `useLocalSearchParams` | `labs/reservar.tsx` | Recebe `id` e `name` do lab selecionado |
+| `useContext` (via `useReservas`) | `labs/reservar.tsx`, `minhas-reservas.tsx` | Estado global de reservas compartilhado |
+| `createContext` | `context/ReservasContext.tsx` | Contexto de reservas com Provider |
 
 ---
-*P.S.: Interface e Base de código criadas pelo Membro 1.*
+
+## 🗂️ Estrutura de Pastas
+
+```
+CP1-aplicativo/
+├── app/
+│   ├── _layout.tsx           ← Stack Navigator (Expo Router)
+│   ├── index.tsx             ← Tela de Login
+│   ├── minhas-reservas.tsx   ← Minhas Reservas
+│   └── labs/
+│       ├── index.tsx         ← Lista de Laboratórios
+│       └── reservar.tsx      ← Formulário de Reserva
+├── components/
+│   ├── Button.tsx
+│   ├── LabCard.tsx
+│   └── ReservaItem.tsx
+├── constants/
+│   └── styles.ts             ← Paleta de cores global
+└── context/
+    └── ReservasContext.tsx   ← Estado global de reservas
+```
+
+---
+
+## ⚙️ Tecnologias
+
+- **React Native** + **Expo** (~52)
+- **Expo Router** v4 — Navegação file-based
+- **TypeScript** — Tipagem estática
+- **React Context API** — Gerenciamento de estado global

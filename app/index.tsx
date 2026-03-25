@@ -1,30 +1,40 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
-// MOCK router para permitir compilação pelo Membro 1 onde Expo Router não está pronto - em um cenário real seria 'expo-router'
-// Considerando que o Membro 2 vai gerenciar as rotas. Apenas estilização é foco aqui.
+import {
+  View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TextInput,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
 import { Button } from '../components/Button';
 import { globalStyles, colors } from '../constants/styles';
 
 export default function LoginScreen() {
-  const [ra, setRa] = useState('');
+  const router = useRouter();
+  const [rm, setRm] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Função mock conectando ao botão, Membro 2 fará o roteamento real.
   const handleLogin = () => {
+    if (!rm.trim()) {
+      Alert.alert('Atenção', 'Por favor, informe seu RM para continuar.');
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      // alert('Mock: Redirecionar para Labs > membro 2 fará com router.push("/labs")');
+      router.push('/labs');
     }, 1000);
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={globalStyles.container} 
+    <KeyboardAvoidingView
+      style={globalStyles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.logoContainer}>
-        {/* Usando uma View com ícone mock, pois não temos assets definidos no PRD */}
         <View style={styles.logoCircle}>
           <Text style={styles.logoEmoji}>🔬</Text>
         </View>
@@ -37,16 +47,18 @@ export default function LoginScreen() {
         <TextInput
           style={globalStyles.input}
           placeholder="Ex: RM90000"
-          value={ra}
-          onChangeText={setRa}
+          value={rm}
+          onChangeText={setRm}
           keyboardType="default"
           autoCapitalize="characters"
+          returnKeyType="done"
+          onSubmitEditing={handleLogin}
         />
 
-        <Button 
-          title="Entrar" 
-          onPress={handleLogin} 
-          isLoading={loading} 
+        <Button
+          title="Entrar"
+          onPress={handleLogin}
+          isLoading={loading}
         />
       </View>
     </KeyboardAvoidingView>
