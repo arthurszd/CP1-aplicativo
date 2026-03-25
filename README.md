@@ -8,8 +8,8 @@
 
 | Membro | Papel | RM |
 |--------|-------|----|
-| [Nome do Membro 1] | UI & Componentes | RM[XXXXX] |
-| [Nome do Membro 2] | Navegação & Lógica | RM[XXXXX] |
+| Arthur de Souza Mtos Dias | UI & Componentes | RM566068 |
+| Guilherme Carreri Giampietro | Navegação & Lógica | RM565676 |
 
 ---
 
