@@ -15,7 +15,8 @@
 
 ## 🎥 Demonstração
 
-> Adicionar aqui o GIF/Vídeo de demonstração do aplicativo rodando.
+![Login](https://github.com/user-attachments/assets/e493a944-8132-4802-9b8a-41e010daf5e5) 
+![Lista de Labs](https://github.com/user-attachments/assets/fca4457c-5756-42e6-8526-a34c8a90aac4)
 
 ---
 
