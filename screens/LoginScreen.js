@@ -50,6 +50,14 @@ export default function LoginScreen() {
       <TouchableOpacity onPress={handleLogin}>
         <Text>Login</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity onPress={props.onGoToRegister}>
+        <Text>Ir para Cadastro</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={props.onGoToHome}>
+        <Text>Ir para Home</Text>
+      </TouchableOpacity>
     </View>
   );
 }

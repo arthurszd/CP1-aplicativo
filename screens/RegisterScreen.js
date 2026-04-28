@@ -58,6 +58,10 @@ export default function RegisterScreen() {
       <TouchableOpacity onPress={handleRegister}>
         <Text>Cadastrar</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity onPress={props.onGoToLogin}>
+        <Text>Voltar para Login</Text>
+      </TouchableOpacity>
     </View>
   );
 }
