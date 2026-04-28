@@ -46,6 +46,14 @@ export default function RootLayout() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="register"
+            options={{ title: 'Cadastro', headerShown: false }}
+          />
+          <Stack.Screen
+            name="home"
+            options={{ title: 'Home', headerShown: false }}
+          />
+          <Stack.Screen
             name="labs/index"
             options={{ title: 'Laboratórios' }}
           />
