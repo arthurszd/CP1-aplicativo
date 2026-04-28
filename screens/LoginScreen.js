@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { loginUser } from '../services/auth';
 
 export default function LoginScreen(props) {
   const [email, setEmail] = useState('');
@@ -21,10 +22,14 @@ export default function LoginScreen(props) {
     return Object.keys(novosErros).length === 0;
   };
 
-  const handleLogin = () => {
-    if (validar()) {
-      console.log('Email:', email);
-      console.log('Senha:', senha);
+  const handleLogin = async () => {
+    if (!validar()) return;
+
+    const resultado = await loginUser(email, senha);
+    if (resultado.success) {
+      props.onGoToHome();
+    } else {
+      Alert.alert('Erro', resultado.message);
     }
   };
 

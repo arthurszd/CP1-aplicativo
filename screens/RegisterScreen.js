@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { registerUser } from '../services/auth';
 
 export default function RegisterScreen(props) {
   const [nome, setNome] = useState('');
@@ -22,11 +23,15 @@ export default function RegisterScreen(props) {
     return Object.keys(novosErros).length === 0;
   };
 
-  const handleRegister = () => {
-    if (validar()) {
-      console.log('Nome:', nome);
-      console.log('Email:', email);
-      console.log('Senha:', senha);
+  const handleRegister = async () => {
+    if (!validar()) return;
+
+    const resultado = await registerUser(nome, email, senha);
+    if (resultado.success) {
+      Alert.alert('Sucesso', resultado.message);
+      props.onGoToLogin();
+    } else {
+      Alert.alert('Erro', resultado.message);
     }
   };
 

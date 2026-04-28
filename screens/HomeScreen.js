@@ -1,19 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet } from 'react-native';
+import { getItems, addItem, removeItem } from '../services/items';
 
 export default function HomeScreen(props) {
   const [itens, setItens] = useState([]);
   const [novoItem, setNovoItem] = useState('');
 
-  const adicionarItem = () => {
+  useEffect(() => {
+    carregarItens();
+  }, []);
+
+  const carregarItens = async () => {
+    const lista = await getItems();
+    setItens(lista);
+  };
+
+  const adicionarItem = async () => {
     if (novoItem.trim()) {
-      setItens([...itens, { id: Date.now().toString(), nome: novoItem }]);
-      setNovoItem('');
+      const resultado = await addItem({ nome: novoItem });
+      if (resultado.success) {
+        setItens(resultado.items);
+        setNovoItem('');
+      }
     }
   };
 
-  const removerItem = (id) => {
-    setItens(itens.filter(item => item.id !== id));
+  const removerItem = async (id) => {
+    const resultado = await removeItem(id);
+    if (resultado.success) {
+      setItens(resultado.items);
+    }
   };
 
   return (
