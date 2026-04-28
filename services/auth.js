@@ -13,7 +13,7 @@ export const registerUser = async (nome, email, senha) => {
   }
 };
 
-// Feature 3: Login
+// Feature 3: Login e validação de credenciais
 export const loginUser = async (email, senha) => {
   try {
     const user = await getData(USER_KEY);
