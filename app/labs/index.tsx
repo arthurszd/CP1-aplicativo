@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LabCard } from '../../components/LabCard';
 import { Button } from '../../components/Button';
@@ -26,9 +26,10 @@ export default function LabsListScreen() {
   const router = useRouter();
   const [labs, setLabs] = useState<Lab[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busca, setBusca] = useState('');
+  const [filtro, setFiltro] = useState<'todos' | 'livre' | 'ocupado'>('todos');
 
   useEffect(() => {
-    // Simula chamada de API para buscar labs
     const timer = setTimeout(() => {
       setLabs(LABS_MOCK);
       setLoading(false);
@@ -36,33 +37,50 @@ export default function LabsListScreen() {
     return () => clearTimeout(timer);
   }, []);
 
+  const labsFiltrados = useMemo(() => {
+    return labs.filter(lab => {
+      const buscaOk = lab.name.toLowerCase().includes(busca.toLowerCase());
+      const filtroOk = filtro === 'todos' || lab.status === filtro;
+      return buscaOk && filtroOk;
+    });
+  }, [labs, busca, filtro]);
+
   const handleReservarLab = (id: string, name: string) => {
     router.push({ pathname: '/labs/reservar', params: { id, name } });
-  };
-
-  const handleVerMinhasReservas = () => {
-    router.push('/minhas-reservas');
   };
 
   if (loading) {
     return (
       <View style={globalStyles.center}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={{ marginTop: 16, color: colors.textLight }}>
-          Buscando laboratórios...
-        </Text>
+        <Text style={{ marginTop: 16, color: colors.textLight }}>Buscando laboratórios...</Text>
       </View>
     );
   }
 
   return (
     <View style={globalStyles.container}>
-      <Text style={globalStyles.subtitle}>
-        Selecione um laboratório para realizar sua reserva.
-      </Text>
+      <TextInput
+        placeholder="Buscar laboratório..."
+        value={busca}
+        onChangeText={setBusca}
+        style={styles.search}
+      />
+
+      <View style={styles.filtros}>
+        {(['todos', 'livre', 'ocupado'] as const).map(op => (
+          <Text
+            key={op}
+            onPress={() => setFiltro(op)}
+            style={[styles.filtroBtn, filtro === op && styles.filtroBtnAtivo]}
+          >
+            {op.charAt(0).toUpperCase() + op.slice(1)}
+          </Text>
+        ))}
+      </View>
 
       <FlatList
-        data={labs}
+        data={labsFiltrados}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <LabCard
@@ -70,29 +88,54 @@ export default function LabsListScreen() {
             status={item.status}
             horaInicio={item.horaInicio}
             horaFim={item.horaFim}
-            onPress={
-              item.status === 'livre'
-                ? () => handleReservarLab(item.id, item.name)
-                : undefined
-            }
+            onPress={item.status === 'livre' ? () => handleReservarLab(item.id, item.name) : undefined}
           />
         )}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyText}>Nenhum laboratório encontrado</Text>
+          </View>
+        }
       />
 
       <View style={styles.footer}>
-        <Button
-          title="Minhas Reservas"
-          type="secondary"
-          onPress={handleVerMinhasReservas}
-        />
+        <Button title="Minhas Reservas" type="secondary" onPress={() => router.push('/minhas-reservas')} />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  search: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 12,
+    backgroundColor: '#fff',
+    fontSize: 15,
+  },
+  filtros: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  filtroBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    color: '#666',
+    fontSize: 13,
+  },
+  filtroBtnAtivo: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    color: '#fff',
+  },
   listContainer: {
     paddingBottom: 24,
   },
@@ -100,5 +143,13 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+  },
+  empty: {
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  emptyText: {
+    color: '#999',
+    fontSize: 15,
   },
 });
