@@ -24,6 +24,19 @@ export default function ReservarScreen() {
   const [horario, setHorario] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const formatarData = (valor: string) => {
+    const nums = valor.replace(/\D/g, '').slice(0, 8);
+    if (nums.length <= 2) return nums;
+    if (nums.length <= 4) return `${nums.slice(0, 2)}/${nums.slice(2)}`;
+    return `${nums.slice(0, 2)}/${nums.slice(2, 4)}/${nums.slice(4)}`;
+  };
+
+  const formatarHorario = (valor: string) => {
+    const nums = valor.replace(/\D/g, '').slice(0, 4);
+    if (nums.length <= 2) return nums;
+    return `${nums.slice(0, 2)}:${nums.slice(2)}`;
+  };
+
   const handleReservar = async () => {
     if (!nomeAluno.trim() || !data.trim() || !horario.trim()) {
       Alert.alert('Campos obrigatórios', 'Preencha todos os campos para continuar.');
@@ -77,8 +90,8 @@ export default function ReservarScreen() {
             style={globalStyles.input}
             placeholder="DD/MM/AAAA"
             value={data}
-            onChangeText={setData}
-            keyboardType="numbers-and-punctuation"
+            onChangeText={(v) => setData(formatarData(v))}
+            keyboardType="numeric"
             maxLength={10}
             returnKeyType="next"
           />
@@ -86,9 +99,11 @@ export default function ReservarScreen() {
           <Text style={globalStyles.label}>Horário</Text>
           <TextInput
             style={globalStyles.input}
-            placeholder="Ex: 14:00 - 16:00"
+            placeholder="HH:MM"
             value={horario}
-            onChangeText={setHorario}
+            onChangeText={(v) => setHorario(formatarHorario(v))}
+            keyboardType="numeric"
+            maxLength={5}
             returnKeyType="done"
             onSubmitEditing={handleReservar}
           />
