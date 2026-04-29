@@ -17,12 +17,10 @@ export default function MinhasReservasScreen() {
         {
           text: 'Sim, cancelar',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             setCancelingId(id);
-            setTimeout(() => {
-              cancelarReserva(id);
-              setCancelingId(null);
-            }, 800);
+            await cancelarReserva(id);
+            setCancelingId(null);
           },
         },
       ]

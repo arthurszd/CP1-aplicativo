@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { saveData, getData } from '../services/storage';
+
+const RESERVAS_KEY = '@reservas_list';
 
 export interface Reserva {
   id: string;
@@ -11,29 +14,47 @@ export interface Reserva {
 
 interface ReservasContextData {
   reservas: Reserva[];
-  adicionarReserva: (reserva: Omit<Reserva, 'id'>) => void;
-  cancelarReserva: (id: string) => void;
+  loading: boolean;
+  adicionarReserva: (reserva: Omit<Reserva, 'id'>) => Promise<void>;
+  cancelarReserva: (id: string) => Promise<void>;
 }
 
 export const ReservasContext = createContext<ReservasContextData>({} as ReservasContextData);
 
 export function ReservasProvider({ children }: { children: React.ReactNode }) {
   const [reservas, setReservas] = useState<Reserva[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const adicionarReserva = (reserva: Omit<Reserva, 'id'>) => {
+  useEffect(() => {
+    carregarReservas();
+  }, []);
+
+  const carregarReservas = async () => {
+    const dados = await getData(RESERVAS_KEY);
+    if (dados && Array.isArray(dados)) {
+      setReservas(dados);
+    }
+    setLoading(false);
+  };
+
+  const adicionarReserva = async (reserva: Omit<Reserva, 'id'>) => {
     const novaReserva: Reserva = {
       ...reserva,
       id: String(Date.now()),
     };
-    setReservas(prev => [novaReserva, ...prev]);
+    const atualizadas = [novaReserva, ...reservas];
+    setReservas(atualizadas);
+    await saveData(RESERVAS_KEY, atualizadas);
   };
 
-  const cancelarReserva = (id: string) => {
-    setReservas(prev => prev.filter(r => r.id !== id));
+  const cancelarReserva = async (id: string) => {
+    const atualizadas = reservas.filter(r => r.id !== id);
+    setReservas(atualizadas);
+    await saveData(RESERVAS_KEY, atualizadas);
   };
 
   return (
-    <ReservasContext.Provider value={{ reservas, adicionarReserva, cancelarReserva }}>
+    <ReservasContext.Provider value={{ reservas, loading, adicionarReserva, cancelarReserva }}>
       {children}
     </ReservasContext.Provider>
   );

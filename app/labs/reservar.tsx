@@ -24,13 +24,12 @@ export default function ReservarScreen() {
   const [horario, setHorario] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleReservar = () => {
+  const handleReservar = async () => {
     if (!nomeAluno.trim() || !data.trim() || !horario.trim()) {
       Alert.alert('Campos obrigatórios', 'Preencha todos os campos para continuar.');
       return;
     }
 
-    // Validação simples de formato de data DD/MM/AAAA
     const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
     if (!dateRegex.test(data)) {
       Alert.alert('Data inválida', 'Informe a data no formato DD/MM/AAAA.');
@@ -38,21 +37,19 @@ export default function ReservarScreen() {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      adicionarReserva({
-        labId: id ?? '',
-        labName: name ?? 'Lab',
-        nomeAluno: nomeAluno.trim(),
-        data: data.trim(),
-        horario: horario.trim(),
-      });
-      setLoading(false);
-      Alert.alert(
-        'Reserva confirmada! ✅',
-        `Seu laboratório "${name}" foi reservado para ${data} às ${horario}.`,
-        [{ text: 'Ok', onPress: () => router.back() }]
-      );
-    }, 1500);
+    await adicionarReserva({
+      labId: id ?? '',
+      labName: name ?? 'Lab',
+      nomeAluno: nomeAluno.trim(),
+      data: data.trim(),
+      horario: horario.trim(),
+    });
+    setLoading(false);
+    Alert.alert(
+      'Reserva confirmada! ✅',
+      `Seu laboratório "${name}" foi reservado para ${data} às ${horario}.`,
+      [{ text: 'Ok', onPress: () => router.back() }]
+    );
   };
 
   return (
