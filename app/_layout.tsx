@@ -1,47 +1,36 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { useEffect, useRef } from 'react';
 import { ReservasProvider } from '../context/ReservasContext';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 
 const ROTAS_PROTEGIDAS = ['labs', 'home', 'minhas-reservas'];
 
-function ProtecaoDeRotas() {
+function RootLayoutInner() {
   const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const mounted = useRef(false);
 
   useEffect(() => {
-    if (loading) return;
+    mounted.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!mounted.current || loading) return;
 
     const rotaAtual = segments[0] as string;
     const estaEmRotaProtegida = ROTAS_PROTEGIDAS.includes(rotaAtual);
 
     if (!user && estaEmRotaProtegida) {
       router.replace('/');
-    } else if (user && (rotaAtual === undefined || rotaAtual === 'index' || rotaAtual === 'register')) {
+    } else if (user && (!rotaAtual || rotaAtual === 'register')) {
       router.replace('/labs');
     }
   }, [user, loading, segments]);
 
-  return null;
-}
-
-function RootLayoutInner() {
-  const { loading } = useAuth();
-
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#E02041" />
-      </View>
-    );
-  }
-
   return (
     <>
-      <ProtecaoDeRotas />
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
