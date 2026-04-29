@@ -1,65 +1,87 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { loginUser } from '../services/auth';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen(props) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erros, setErros] = useState({});
+  const [erroGeral, setErroGeral] = useState('');
 
-  const validar = () => {
-    const novosErros = {};
+  const validarCampo = (campo, valor) => {
+    const novosErros = { ...erros };
 
-    if (!email.includes('@')) {
-      novosErros.email = 'Email deve conter @';
-    }
-
-    if (senha.length < 6) {
-      novosErros.senha = 'Senha deve ter no mínimo 6 caracteres';
+    switch (campo) {
+      case 'email':
+        if (!valor.trim()) novosErros.email = 'O e-mail é obrigatório';
+        else if (!EMAIL_REGEX.test(valor)) novosErros.email = 'Formato de e-mail inválido';
+        else delete novosErros.email;
+        break;
+      case 'senha':
+        if (!valor) novosErros.senha = 'A senha é obrigatória';
+        else if (valor.length < 6) novosErros.senha = 'A senha deve ter no mínimo 6 caracteres';
+        else delete novosErros.senha;
+        break;
     }
 
     setErros(novosErros);
-    return Object.keys(novosErros).length === 0;
   };
 
-  const handleLogin = async () => {
-    if (!validar()) return;
+  const formularioValido = () =>
+    EMAIL_REGEX.test(email) && senha.length >= 6 && Object.keys(erros).length === 0;
 
+  const handleLogin = async () => {
+    setErroGeral('');
     const resultado = await loginUser(email, senha);
     if (resultado.success) {
       props.onGoToHome();
     } else {
-      Alert.alert('Erro', resultado.message);
+      setErroGeral(resultado.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>FIAP Labs</Text>
-      <Text style={styles.subtitle}>Reserva de Laboratórios</Text>
+      <View style={styles.logoArea}>
+        <Text style={styles.logo}>🔬</Text>
+        <Text style={styles.title}>FIAP Labs</Text>
+        <Text style={styles.subtitle}>Reserva de Laboratórios</Text>
+      </View>
+
+      {erroGeral ? <Text style={styles.erroGeral}>{erroGeral}</Text> : null}
 
       <View style={styles.inputContainer}>
+        <Text style={styles.label}>E-mail</Text>
         <TextInput
-          placeholder="Email"
+          placeholder="usuario@dominio.com"
           value={email}
-          onChangeText={setEmail}
-          style={styles.input}
+          onChangeText={(v) => { setEmail(v); validarCampo('email', v); }}
+          style={[styles.input, erros.email && styles.inputError]}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
-        {erros.email && <Text style={styles.error}>{erros.email}</Text>}
+        {erros.email && <Text style={styles.erro}>{erros.email}</Text>}
       </View>
 
       <View style={styles.inputContainer}>
+        <Text style={styles.label}>Senha</Text>
         <TextInput
-          placeholder="Senha"
+          placeholder="Digite sua senha"
           value={senha}
-          onChangeText={setSenha}
+          onChangeText={(v) => { setSenha(v); validarCampo('senha', v); }}
+          style={[styles.input, erros.senha && styles.inputError]}
           secureTextEntry
-          style={styles.input}
         />
-        {erros.senha && <Text style={styles.error}>{erros.senha}</Text>}
+        {erros.senha && <Text style={styles.erro}>{erros.senha}</Text>}
       </View>
 
-      <TouchableOpacity onPress={handleLogin} style={styles.button}>
+      <TouchableOpacity
+        onPress={handleLogin}
+        style={[styles.button, !formularioValido() && styles.buttonDisabled]}
+        disabled={!formularioValido()}
+      >
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
 
@@ -73,55 +95,81 @@ export default function LoginScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 24,
     justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+  logoArea: {
     alignItems: 'center',
+    marginBottom: 36,
+  },
+  logo: {
+    fontSize: 52,
+    marginBottom: 8,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: '#1a1a1a',
     marginBottom: 4,
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
     color: '#888',
-    marginBottom: 30,
-    textAlign: 'center',
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#444',
+    marginBottom: 4,
   },
   inputContainer: {
-    width: '100%',
-    marginBottom: 15,
+    marginBottom: 16,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 5,
+    borderColor: '#ddd',
+    padding: 12,
+    borderRadius: 8,
+    fontSize: 15,
+    backgroundColor: '#fafafa',
   },
-  error: {
-    color: 'red',
+  inputError: {
+    borderColor: '#E02041',
+  },
+  erro: {
+    color: '#E02041',
     fontSize: 12,
+    marginTop: 4,
+  },
+  erroGeral: {
+    color: '#E02041',
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 5,
+    backgroundColor: '#E02041',
+    padding: 14,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
-    width: '100%',
+    marginTop: 8,
+  },
+  buttonDisabled: {
+    backgroundColor: '#ccc',
   },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   linkButton: {
-    marginTop: 15,
+    marginTop: 16,
     padding: 10,
+    alignItems: 'center',
   },
   linkButtonText: {
-    color: '#007AFF',
-    textAlign: 'center',
+    color: '#E02041',
+    fontSize: 14,
   },
 });
