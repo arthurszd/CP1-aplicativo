@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { loginUser } from '../services/auth';
+import { useAuth } from '../context/AuthContext';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen(props) {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erros, setErros] = useState({});
@@ -34,7 +35,7 @@ export default function LoginScreen(props) {
 
   const handleLogin = async () => {
     setErroGeral('');
-    const resultado = await loginUser(email, senha);
+    const resultado = await login(email, senha);
     if (resultado.success) {
       props.onGoToHome();
     } else {

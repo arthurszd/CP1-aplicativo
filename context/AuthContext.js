@@ -1,11 +1,12 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { loginUser as loginService, getSession } from '../services/auth';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { loginUser as loginService, registerUser as registerService, getSession } from '../services/auth';
 import { removeData } from '../services/storage';
 
 export const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadSession = async () => {
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }) => {
       if (result && result.success && result.session) {
         setUser(result.session);
       }
+      setLoading(false);
     };
     loadSession();
   }, []);
@@ -25,14 +27,20 @@ export const AuthProvider = ({ children }) => {
     return result;
   };
 
+  const register = async (nome, email, senha) => {
+    return await registerService(nome, email, senha);
+  };
+
   const logout = async () => {
     await removeData('@userLogged');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);

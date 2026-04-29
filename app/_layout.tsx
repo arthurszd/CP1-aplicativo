@@ -1,71 +1,73 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { ReservasProvider } from '../context/ReservasContext';
-import { AuthProvider } from '../context/AuthContext';
-import { getSession } from '../services/auth';
-import { getItems } from '../services/items';
+import { AuthProvider, useAuth } from '../context/AuthContext';
+
+const ROTAS_PROTEGIDAS = ['labs', 'home', 'minhas-reservas'];
+
+function ProtecaoDeRotas() {
+  const { user, loading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+
+    const rotaAtual = segments[0] as string;
+    const estaEmRotaProtegida = ROTAS_PROTEGIDAS.includes(rotaAtual);
+
+    if (!user && estaEmRotaProtegida) {
+      router.replace('/');
+    } else if (user && (rotaAtual === undefined || rotaAtual === 'index' || rotaAtual === 'register')) {
+      router.replace('/labs');
+    }
+  }, [user, loading, segments]);
+
+  return null;
+}
+
+function RootLayoutInner() {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#E02041" />
+      </View>
+    );
+  }
+
+  return (
+    <>
+      <ProtecaoDeRotas />
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: '#E02041' },
+          headerTintColor: '#FFF',
+          headerTitleStyle: { fontWeight: 'bold' },
+          headerBackTitle: 'Voltar',
+          contentStyle: { backgroundColor: '#F0F0F5' },
+        }}
+      >
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="home" options={{ headerShown: false }} />
+        <Stack.Screen name="labs/index" options={{ title: 'Laboratórios' }} />
+        <Stack.Screen name="labs/reservar" options={{ title: 'Nova Reserva' }} />
+        <Stack.Screen name="minhas-reservas" options={{ title: 'Minhas Reservas' }} />
+      </Stack>
+    </>
+  );
+}
 
 export default function RootLayout() {
-  // Feature 7: Carregar dados iniciais
-  useEffect(() => {
-    const loadStoredData = async () => {
-      try {
-        const session = await getSession();
-        const itemsList = await getItems();
-        console.log('Dados carregados na inicialização:', { session, itemsList });
-      } catch (error) {
-        console.error('Erro ao carregar dados na inicialização', error);
-      }
-    };
-    
-    loadStoredData();
-  }, []);
-
   return (
     <AuthProvider>
       <ReservasProvider>
-        <StatusBar style="dark" />
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: '#E02041',
-            },
-            headerTintColor: '#FFF',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-            headerBackTitle: 'Voltar',
-            contentStyle: {
-              backgroundColor: '#F0F0F5',
-            },
-          }}
-        >
-          <Stack.Screen
-            name="index"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="register"
-            options={{ title: 'Cadastro', headerShown: false }}
-          />
-          <Stack.Screen
-            name="home"
-            options={{ title: 'Home', headerShown: false }}
-          />
-          <Stack.Screen
-            name="labs/index"
-            options={{ title: 'Laboratórios' }}
-          />
-          <Stack.Screen
-            name="labs/reservar"
-            options={{ title: 'Nova Reserva' }}
-          />
-          <Stack.Screen
-            name="minhas-reservas"
-            options={{ title: 'Minhas Reservas' }}
-          />
-        </Stack>
+        <RootLayoutInner />
       </ReservasProvider>
     </AuthProvider>
   );

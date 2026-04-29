@@ -1,10 +1,17 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
 export default function HomeScreen(props) {
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo!</Text>
+      <Text style={styles.title}>Olá, {user?.nome || 'Aluno'}!</Text>
       <Text style={styles.subtitle}>O que deseja fazer?</Text>
 
       <TouchableOpacity onPress={props.onGoToLabs} style={styles.card}>
@@ -19,7 +26,7 @@ export default function HomeScreen(props) {
         <Text style={[styles.cardDesc, { color: '#555' }]}>Veja e gerencie suas reservas ativas</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={props.onLogout} style={styles.logoutButton}>
+      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Sair</Text>
       </TouchableOpacity>
     </View>

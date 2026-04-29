@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-native';
-import { registerUser } from '../services/auth';
+import { useAuth } from '../context/AuthContext';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function RegisterScreen(props) {
+  const { register } = useAuth();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -53,7 +54,7 @@ export default function RegisterScreen(props) {
   };
 
   const handleRegister = async () => {
-    const resultado = await registerUser(nome, email, senha);
+    const resultado = await register(nome, email, senha);
     if (resultado.success) {
       setSucesso('Cadastro realizado com sucesso!');
       setTimeout(() => props.onGoToLogin(), 1500);
