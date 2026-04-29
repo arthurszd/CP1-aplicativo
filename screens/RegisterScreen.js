@@ -37,7 +37,8 @@ export default function RegisterScreen(props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register Screen</Text>
+      <Text style={styles.title}>Criar Conta</Text>
+      <Text style={styles.subtitle}>Cadastre-se para reservar laboratórios</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
@@ -74,7 +75,7 @@ export default function RegisterScreen(props) {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={props.onGoToLogin} style={styles.linkButton}>
-        <Text style={styles.linkButtonText}>Voltar para Login</Text>
+        <Text style={styles.linkButtonText}>Já tem conta? Entrar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -88,8 +89,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#888',
     marginBottom: 30,
     textAlign: 'center',
   },

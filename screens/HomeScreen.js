@@ -1,70 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet } from 'react-native';
-import { getItems, addItem, removeItem } from '../services/items';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function HomeScreen(props) {
-  const [itens, setItens] = useState([]);
-  const [novoItem, setNovoItem] = useState('');
-
-  useEffect(() => {
-    carregarItens();
-  }, []);
-
-  const carregarItens = async () => {
-    const lista = await getItems();
-    setItens(lista);
-  };
-
-  const adicionarItem = async () => {
-    if (novoItem.trim()) {
-      const resultado = await addItem({ nome: novoItem });
-      if (resultado.success) {
-        setItens(resultado.items);
-        setNovoItem('');
-      }
-    }
-  };
-
-  const removerItem = async (id) => {
-    const resultado = await removeItem(id);
-    if (resultado.success) {
-      setItens(resultado.items);
-    }
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Home Screen</Text>
+      <Text style={styles.title}>Bem-vindo!</Text>
+      <Text style={styles.subtitle}>O que deseja fazer?</Text>
 
-      <View style={styles.inputSection}>
-        <TextInput
-          placeholder="Digite um novo item"
-          value={novoItem}
-          onChangeText={setNovoItem}
-          style={styles.input}
-        />
-        <TouchableOpacity onPress={adicionarItem} style={styles.addButton}>
-          <Text style={styles.buttonText}>Adicionar</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={props.onGoToLabs} style={styles.card}>
+        <Text style={styles.cardEmoji}>🔬</Text>
+        <Text style={styles.cardTitle}>Laboratórios</Text>
+        <Text style={styles.cardDesc}>Veja os labs disponíveis e faça uma reserva</Text>
+      </TouchableOpacity>
 
-      <Text style={styles.subtitle}>Itens:</Text>
-      <FlatList
-        data={itens}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            <Text style={styles.itemText}>{item.nome}</Text>
-            <TouchableOpacity onPress={() => removerItem(item.id)} style={styles.removeButton}>
-              <Text style={styles.buttonText}>Remover</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum item adicionado</Text>}
-      />
+      <TouchableOpacity onPress={props.onGoToReservas} style={[styles.card, styles.cardSecondary]}>
+        <Text style={styles.cardEmoji}>📋</Text>
+        <Text style={[styles.cardTitle, { color: '#E02041' }]}>Minhas Reservas</Text>
+        <Text style={[styles.cardDesc, { color: '#555' }]}>Veja e gerencie suas reservas ativas</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={props.onLogout} style={styles.logoutButton}>
-        <Text style={styles.buttonText}>Logout</Text>
+        <Text style={styles.logoutText}>Sair</Text>
       </TouchableOpacity>
     </View>
   );
@@ -73,73 +29,56 @@ export default function HomeScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 24,
     backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
     textAlign: 'center',
+    marginBottom: 4,
   },
   subtitle: {
+    fontSize: 15,
+    color: '#888',
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  card: {
+    backgroundColor: '#E02041',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  cardSecondary: {
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: '#E02041',
+  },
+  cardEmoji: {
+    fontSize: 36,
+    marginBottom: 8,
+  },
+  cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#fff',
+    marginBottom: 4,
   },
-  inputSection: {
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-    backgroundColor: 'white',
-  },
-  addButton: {
-    backgroundColor: '#4CAF50',
-    padding: 12,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  removeButton: {
-    backgroundColor: '#f44336',
-    padding: 8,
-    borderRadius: 5,
+  cardDesc: {
+    fontSize: 13,
+    color: '#fff',
+    textAlign: 'center',
   },
   logoutButton: {
-    backgroundColor: '#808080',
+    marginTop: 24,
     padding: 12,
-    borderRadius: 5,
     alignItems: 'center',
-    marginTop: 20,
   },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  itemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    backgroundColor: 'white',
-    marginBottom: 5,
-    borderRadius: 5,
-  },
-  itemText: {
-    fontSize: 16,
-    flex: 1,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#999',
-    fontSize: 14,
+  logoutText: {
+    color: '#888',
+    fontSize: 15,
   },
 });

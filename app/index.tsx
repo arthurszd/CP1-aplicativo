@@ -6,7 +6,7 @@ export default function IndexPage() {
   return (
     <LoginScreen
       onGoToRegister={() => router.push('/register')}
-      onGoToHome={() => router.push('/home')}
+      onGoToHome={() => router.push('/labs')}
     />
   );
 }

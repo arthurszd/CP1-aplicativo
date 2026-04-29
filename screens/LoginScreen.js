@@ -35,7 +35,8 @@ export default function LoginScreen(props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login Screen</Text>
+      <Text style={styles.title}>FIAP Labs</Text>
+      <Text style={styles.subtitle}>Reserva de Laboratórios</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
@@ -59,15 +60,11 @@ export default function LoginScreen(props) {
       </View>
 
       <TouchableOpacity onPress={handleLogin} style={styles.button}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={props.onGoToRegister} style={styles.linkButton}>
-        <Text style={styles.linkButtonText}>Ir para Cadastro</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={props.onGoToHome} style={styles.linkButton}>
-        <Text style={styles.linkButtonText}>Ir para Home</Text>
+        <Text style={styles.linkButtonText}>Não tem conta? Cadastre-se</Text>
       </TouchableOpacity>
     </View>
   );
@@ -81,8 +78,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#888',
     marginBottom: 30,
     textAlign: 'center',
   },

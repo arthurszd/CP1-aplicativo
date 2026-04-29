@@ -5,6 +5,8 @@ export default function HomePage() {
   const router = useRouter();
   return (
     <HomeScreen
+      onGoToLabs={() => router.push('/labs')}
+      onGoToReservas={() => router.push('/minhas-reservas')}
       onLogout={() => router.push('/')}
     />
   );
