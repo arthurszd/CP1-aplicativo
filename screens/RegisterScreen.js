@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function RegisterScreen(props) {
   const { register } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -54,7 +55,9 @@ export default function RegisterScreen(props) {
   };
 
   const handleRegister = async () => {
+    setLoading(true);
     const resultado = await register(nome, email, senha);
+    setLoading(false);
     if (resultado.success) {
       setSucesso('Cadastro realizado com sucesso!');
       setTimeout(() => props.onGoToLogin(), 1500);
@@ -64,6 +67,7 @@ export default function RegisterScreen(props) {
   };
 
   return (
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <Text style={styles.title}>Criar Conta</Text>
       <Text style={styles.subtitle}>Cadastre-se para reservar laboratórios</Text>
@@ -126,16 +130,20 @@ export default function RegisterScreen(props) {
 
       <TouchableOpacity
         onPress={handleRegister}
-        style={[styles.button, !formularioValido() && styles.buttonDisabled]}
-        disabled={!formularioValido()}
+        style={[styles.button, (!formularioValido() || loading) && styles.buttonDisabled]}
+        disabled={!formularioValido() || loading}
       >
-        <Text style={styles.buttonText}>Cadastrar</Text>
+        {loading
+          ? <ActivityIndicator color="#fff" />
+          : <Text style={styles.buttonText}>Cadastrar</Text>
+        }
       </TouchableOpacity>
 
       <TouchableOpacity onPress={props.onGoToLogin} style={styles.linkButton}>
         <Text style={styles.linkButtonText}>Já tem conta? Entrar</Text>
       </TouchableOpacity>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

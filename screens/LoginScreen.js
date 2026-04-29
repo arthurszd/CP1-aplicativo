@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -10,6 +10,7 @@ export default function LoginScreen(props) {
   const [senha, setSenha] = useState('');
   const [erros, setErros] = useState({});
   const [erroGeral, setErroGeral] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const validarCampo = (campo, valor) => {
     const novosErros = { ...erros };
@@ -35,7 +36,9 @@ export default function LoginScreen(props) {
 
   const handleLogin = async () => {
     setErroGeral('');
+    setLoading(true);
     const resultado = await login(email, senha);
+    setLoading(false);
     if (resultado.success) {
       props.onGoToHome();
     } else {
@@ -44,6 +47,10 @@ export default function LoginScreen(props) {
   };
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
     <View style={styles.container}>
       <View style={styles.logoArea}>
         <Text style={styles.logo}>🔬</Text>
@@ -80,16 +87,20 @@ export default function LoginScreen(props) {
 
       <TouchableOpacity
         onPress={handleLogin}
-        style={[styles.button, !formularioValido() && styles.buttonDisabled]}
-        disabled={!formularioValido()}
+        style={[styles.button, (!formularioValido() || loading) && styles.buttonDisabled]}
+        disabled={!formularioValido() || loading}
       >
-        <Text style={styles.buttonText}>Entrar</Text>
+        {loading
+          ? <ActivityIndicator color="#fff" />
+          : <Text style={styles.buttonText}>Entrar</Text>
+        }
       </TouchableOpacity>
 
       <TouchableOpacity onPress={props.onGoToRegister} style={styles.linkButton}>
         <Text style={styles.linkButtonText}>Não tem conta? Cadastre-se</Text>
       </TouchableOpacity>
     </View>
+    </KeyboardAvoidingView>
   );
 }
 
